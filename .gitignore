@@ -1,0 +1,62 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Kaggle API key / secrets
+kaggle.json
+.env
+*.env
+
+# Dataset / large files
+data/
+datasets/
+*.zip
+*.tar
+*.gz
+
+# Model weights only
+*.pth
+*.pt
+*.onnx
+*.pkl
+*.joblib
+
+# VS Code / IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test / cache
+.pytest_cache/
+.mypy_cache/
+.cache/
+
+test_images/
+
+# Build files
+build/
+dist/
+*.egg-info/
+
+# Logs / temp
+*.log
+temp/
+tmp/
+
+# Flask runtime files
+uploads/
+instance/

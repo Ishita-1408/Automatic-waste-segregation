@@ -1,0 +1,22 @@
+{
+  "model": "EfficientNet-B0",
+  "num_classes": 12,
+  "class_names": [
+    "battery",
+    "biological",
+    "brown-glass",
+    "cardboard",
+    "clothes",
+    "green-glass",
+    "metal",
+    "paper",
+    "plastic",
+    "shoes",
+    "trash",
+    "white-glass"
+  ],
+  "img_size": 224,
+  "test_accuracy": 0.7324306898774984,
+  "best_val_accuracy": 0.7309840996991835,
+  "trained_at": "2026-04-01T02:43:59.233270"
+}
