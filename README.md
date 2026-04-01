@@ -152,27 +152,27 @@ Softmax → class probabilities
 ### 1) WasteAI Homepage
 Upload interface with drag-and-drop support.
 
-![WasteAI Homepage](docs\homepage.png)
+![WasteAI Homepage](docs/homepage.png)
 
 ---
 
 ### 2) Image Upload
 Users can drag & drop or click to upload any waste image.
 
-![Upload](docs\upload.png)
+![Upload](docs/upload.png)
 
 ---
 
 ### 3) Prediction Result
 The app shows predicted class, confidence score, recyclability, disposal bin, and top scores.
 
-![Result](docs\result1.png)
+![Result](docs/result1.png)
 
 ---
 
 ### 4) Another Example Prediction
 
-![Result Glass](docs\result2.png)
+![Result Glass](docs/result2.png)
 
 
 
@@ -195,8 +195,11 @@ waste-segregation/
 ├── tests/
 │   └── test_model.py         # Unit tests (pytest)
 │
-├── docs/
-│   └── screenshots/          # App screenshots for README
+├── docs/                   
+│   ├── homepage.png
+│   ├── upload.png
+│   ├── result1.png
+│   └── result2.png
 │
 ├── models/                   # Saved weights & metadata (gitignored)
 │   ├── best_model.pth
@@ -221,7 +224,7 @@ waste-segregation/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/waste-segregation.git
+git clone https://github.com/Ishita-1408/Automatic-waste-segregation.git
 cd waste-segregation
 ```
 
