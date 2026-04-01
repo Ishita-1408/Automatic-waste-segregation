@@ -311,16 +311,17 @@ python src/predict.py --image path/to/your/image.jpg
 **Example output:**
 ```
 ==================================================
-Image      : bottle.jpg
-Prediction : PLASTIC (94.2%)
-Bin        : Yellow (Plastic)
+Prediction : METAL (68.4%)
+Bin        : Blue (Recyclable)
 Recyclable : Yes ♻
-Tip        : Check the resin code. Codes 1 & 2 are most widely accepted.
+Tip        : Rinse the item before recycling if contaminated.
 
 Top predictions:
-  plastic      ████████████████████  94.2%
-  white-glass  ██                     3.1%
-  metal                               1.8%
+  metal        ██████████████         68.4%
+  paper        ███                    13.2%
+  shoes        ██                      7.8%
+  white-glass  █                       2.7%
+  plastic      █                       2.6%
 ```
 
 **Batch prediction (whole folder):**
