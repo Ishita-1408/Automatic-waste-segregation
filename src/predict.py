@@ -54,6 +54,7 @@ TIPS = {
     },
 }
 
+
 # Model
 
 def load_model(model_path: str, meta_path: str, device: torch.device):
@@ -83,21 +84,22 @@ def get_transform(img_size: int = 224):
                              [0.229, 0.224, 0.225]),
     ])
 
-#  Prediction 
+
+# Prediction
 
 def predict_image(image_path: str, model, meta: dict, device: torch.device) -> dict:
-    transform   = get_transform(meta["img_size"])
-    img         = Image.open(image_path).convert("RGB")
-    tensor      = transform(img).unsqueeze(0).to(device)
+    transform = get_transform(meta["img_size"])
+    img = Image.open(image_path).convert("RGB")
+    tensor = transform(img).unsqueeze(0).to(device)
 
     with torch.no_grad():
-        logits  = model(tensor)
-        probs   = torch.softmax(logits, dim=1)[0]
+        logits = model(tensor)
+        probs = torch.softmax(logits, dim=1)[0]
 
-    class_names  = meta["class_names"]
-    conf, idx    = probs.max(0)
-    label        = class_names[idx.item()]
-    tip_info     = TIPS.get(label, {})
+    class_names = meta["class_names"]
+    conf, idx = probs.max(0)
+    label = class_names[idx.item()]
+    tip_info = TIPS.get(label, {})
 
     top5 = sorted(
         [{"class": class_names[i], "confidence": round(probs[i].item(), 4)}
@@ -106,36 +108,41 @@ def predict_image(image_path: str, model, meta: dict, device: torch.device) -> d
     )
 
     return {
-        "image":       image_path,
-        "label":       label,
-        "confidence":  round(conf.item(), 4),
-        "bin":         tip_info.get("bin", "Unknown"),
-        "tip":         tip_info.get("tip", ""),
-        "recyclable":  tip_info.get("recyclable", False),
-        "top5":        top5,
+        "image": image_path,
+        "label": label,
+        "confidence": round(conf.item(), 4),
+        "bin": tip_info.get("bin", "Unknown"),
+        "tip": tip_info.get("tip", ""),
+        "recyclable": tip_info.get("recyclable", False),
+        "top5": top5,
     }
 
 
-def predict_dir(dir_path: str, model, meta: dict, device: torch.device) -> list[dict]:
-    exts    = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
+def predict_dir(dir_path: str, model, meta: dict, device: torch.device) -> list:
+    exts = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
     results = []
-    paths   = [p for p in Path(dir_path).rglob("*") if p.suffix.lower() in exts]
+    paths = [p for p in Path(dir_path).rglob("*") if p.suffix.lower() in exts]
     for p in sorted(paths):
         result = predict_image(str(p), model, meta, device)
         results.append(result)
         recyclable_tag = "♻ " if result["recyclable"] else "🗑 "
-        print(f"{recyclable_tag}{p.name:40s} → {result['label']:12s} ({result['confidence']:.1%})  [{result['bin']}]")
+        print(f"{recyclable_tag}{p.name:40s} → {result['label']:12s} "
+              f"({result['confidence']:.1%})  [{result['bin']}]")
     return results
+
 
 # ─── CLI ─────────────────────────────────────────────────────────────────────
 
 def main():
     parser = argparse.ArgumentParser(description="Predict waste category for image(s)")
-    parser.add_argument("--image",      help="Path to a single image")
-    parser.add_argument("--dir",        help="Path to a folder of images")
-    parser.add_argument("--model",      default="models/best_model.pth",  help="Model weights path")
-    parser.add_argument("--meta",       default="models/model_meta.json", help="Model metadata JSON")
-    parser.add_argument("--output",     default="",                        help="Optional JSON output path")
+    parser.add_argument("--image", help="Path to a single image")
+    parser.add_argument("--dir", help="Path to a folder of images")
+    parser.add_argument("--model", default="models/best_model.pth",
+                        help="Model weights path")
+    parser.add_argument("--meta", default="models/model_meta.json",
+                        help="Model metadata JSON")
+    parser.add_argument("--output", default="",
+                        help="Optional JSON output path")
     args = parser.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -149,7 +156,7 @@ def main():
         print(f"Bin        : {result['bin']}")
         print(f"Recyclable : {'Yes ♻' if result['recyclable'] else 'No 🗑'}")
         print(f"Tip        : {result['tip']}")
-        print(f"\nTop predictions:")
+        print("\nTop predictions:")
         for item in result["top5"]:
             bar = "█" * int(item["confidence"] * 20)
             print(f"  {item['class']:12s} {bar:20s} {item['confidence']:.1%}")
@@ -158,7 +165,6 @@ def main():
     elif args.dir:
         print(f"Scanning {args.dir} ...\n")
         results = predict_dir(args.dir, model, meta, device)
-        # Summary stats
         from collections import Counter
         counts = Counter(r["label"] for r in results)
         print(f"\n{'='*50}")
@@ -170,7 +176,6 @@ def main():
         return
 
     if args.output:
-        import json
         with open(args.output, "w") as f:
             json.dump(results, f, indent=2)
         print(f"\nResults saved to {args.output}")
