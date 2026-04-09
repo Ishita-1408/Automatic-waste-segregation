@@ -2,7 +2,6 @@
 Tests for Waste Segregation model utilities.
 Run: pytest tests/ -v
 """
-import json
 import os
 import sys
 import tempfile
