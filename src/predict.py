@@ -8,7 +8,6 @@ Usage:
     python src/predict.py --dir  path/to/folder/
 """
 
-import os
 import json
 import argparse
 from pathlib import Path
