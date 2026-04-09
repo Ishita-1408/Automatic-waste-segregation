@@ -27,11 +27,11 @@ import seaborn as sns
 # ─── Config ──────────────────────────────────────────────────────────────────
 
 CLASS_NAMES = None
-IMG_SIZE    = 224
-BATCH_SIZE  = 32
-NUM_EPOCHS  = 20
-LR          = 1e-4
-DEVICE      = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+IMG_SIZE = 224
+BATCH_SIZE = 32
+NUM_EPOCHS = 20
+LR = 1e-4
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # ─── Data Transforms ─────────────────────────────────────────────────────────
 
@@ -56,6 +56,7 @@ val_transforms = transforms.Compose([
 
 # ─── Model ───────────────────────────────────────────────────────────────────
 
+
 def build_model(num_classes: int, freeze_backbone: bool = False) -> nn.Module:
     """EfficientNet-B0 for waste classification (no internet download)."""
     model = models.efficientnet_b0(weights=None)
@@ -76,6 +77,7 @@ def build_model(num_classes: int, freeze_backbone: bool = False) -> nn.Module:
     return model
 
 # ─── Training Loop ────────────────────────────────────────────────────────────
+
 
 def train_one_epoch(model, loader, criterion, optimizer, device):
     model.train()
@@ -119,17 +121,20 @@ def evaluate(model, loader, criterion, device):
 
 # ─── Plotting ────────────────────────────────────────────────────────────────
 
+
 def plot_history(history: dict, save_dir: str):
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
     epochs = range(1, len(history["train_acc"]) + 1)
 
     axes[0].plot(epochs, history["train_loss"], label="Train")
     axes[0].plot(epochs, history["val_loss"], label="Val")
-    axes[0].set_title("Loss"); axes[0].legend()
+    axes[0].set_title("Loss")
+    axes[0].legend()
 
     axes[1].plot(epochs, history["train_acc"], label="Train")
     axes[1].plot(epochs, history["val_acc"], label="Val")
-    axes[1].set_title("Accuracy"); axes[1].legend()
+    axes[1].set_title("Accuracy")
+    axes[1].legend()
 
     plt.tight_layout()
     plt.savefig(os.path.join(save_dir, "training_history.png"), dpi=150)
@@ -141,13 +146,15 @@ def plot_confusion_matrix(labels, preds, class_names, save_dir):
     fig, ax = plt.subplots(figsize=(8, 7))
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues",
                 xticklabels=class_names, yticklabels=class_names, ax=ax)
-    ax.set_xlabel("Predicted"); ax.set_ylabel("True")
+    ax.set_xlabel("Predicted")
+    ax.set_ylabel("True")
     ax.set_title("Confusion Matrix")
     plt.tight_layout()
     plt.savefig(os.path.join(save_dir, "confusion_matrix.png"), dpi=150)
     plt.close()
 
 # ─── Main ────────────────────────────────────────────────────────────────────
+
 
 def main(data_dir: str, output_dir: str):
     os.makedirs(output_dir, exist_ok=True)
@@ -156,34 +163,40 @@ def main(data_dir: str, output_dir: str):
 
     # Dataset
     full_dataset = datasets.ImageFolder(data_dir, transform=train_transforms)
-    class_names  = full_dataset.classes
-    n            = len(full_dataset)
-    n_val        = int(0.15 * n)
-    n_test       = int(0.10 * n)
-    n_train      = n - n_val - n_test
+    class_names = full_dataset.classes
+    n = len(full_dataset)
+    n_val = int(0.15 * n)
+    n_test = int(0.10 * n)
+    n_train = n - n_val - n_test
 
-    train_ds, val_ds, test_ds = random_split(full_dataset, [n_train, n_val, n_test],
-                                              generator=torch.Generator().manual_seed(42))
-    val_ds.dataset  = datasets.ImageFolder(data_dir, transform=val_transforms)
+    train_ds, val_ds, test_ds = random_split(
+        full_dataset, [n_train, n_val, n_test],
+        generator=torch.Generator().manual_seed(42)
+    )
+    val_ds.dataset = datasets.ImageFolder(data_dir, transform=val_transforms)
     test_ds.dataset = datasets.ImageFolder(data_dir, transform=val_transforms)
 
-    train_loader = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True,  num_workers=0, pin_memory=False)
-    val_loader   = DataLoader(val_ds,   batch_size=BATCH_SIZE, shuffle=False, num_workers=0, pin_memory=False)
-    test_loader  = DataLoader(test_ds,  batch_size=BATCH_SIZE, shuffle=False, num_workers=0, pin_memory=False)
-
-   
+    train_loader = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True,
+                              num_workers=0, pin_memory=False)
+    val_loader = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False,
+                            num_workers=0, pin_memory=False)
+    test_loader = DataLoader(test_ds, batch_size=BATCH_SIZE, shuffle=False,
+                             num_workers=0, pin_memory=False)
 
     print(f"[INFO] Train: {n_train} | Val: {n_val} | Test: {n_test}")
     print("[INFO] Building model...")
 
     # Model
-    model     = build_model(len(class_names)).to(DEVICE)
+    model = build_model(len(class_names)).to(DEVICE)
     print("[INFO] Model built successfully.")
     criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
-    optimizer = optim.AdamW(filter(lambda p: p.requires_grad, model.parameters()), lr=LR, weight_decay=1e-4)
+    optimizer = optim.AdamW(
+        filter(lambda p: p.requires_grad, model.parameters()),
+        lr=LR, weight_decay=1e-4
+    )
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=NUM_EPOCHS)
 
-    history   = {"train_loss": [], "val_loss": [], "train_acc": [], "val_acc": []}
+    history = {"train_loss": [], "val_loss": [], "train_acc": [], "val_acc": []}
     best_val_acc = 0.0
 
     for epoch in range(1, NUM_EPOCHS + 1):
@@ -239,7 +252,9 @@ def main(data_dir: str, output_dir: str):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train Waste Segregation Model")
-    parser.add_argument("--data",   default="data/garbage_classification", help="Path to dataset root")
-    parser.add_argument("--output", default="models/",                     help="Where to save model & plots")
+    parser.add_argument("--data", default="data/garbage_classification",
+                        help="Path to dataset root")
+    parser.add_argument("--output", default="models/",
+                        help="Where to save model & plots")
     args = parser.parse_args()
     main(args.data, args.output)
