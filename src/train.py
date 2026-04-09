@@ -11,9 +11,7 @@ Current dataset contains 12 waste classes.
 import os
 import json
 import argparse
-import numpy as np
 import matplotlib.pyplot as plt
-from pathlib import Path
 from datetime import datetime
 
 import torch
